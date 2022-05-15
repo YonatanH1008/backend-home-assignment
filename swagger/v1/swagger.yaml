@@ -1,0 +1,766 @@
+---
+openapi: 3.0.3
+security:
+- bearerAuth: []
+info:
+  title: Hello World
+  version: v1
+  description: Hello World
+  contact:
+    name: API Support
+    email: support@nemodata.ai
+components:
+  parameters:
+    page:
+      name: page
+      in: query
+      description: Page Number
+      schema:
+        type: integer
+        default: 1
+    itemsPerPage:
+      name: itemsPerPage
+      in: query
+      description: Page Number
+      schema:
+        type: integer
+        default: 30
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    errors_object:
+      type: object
+      required:
+      - errors
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    vehicle:
+      type: object
+      properties:
+        vin:
+          type: string
+          minLength: 17
+          maxLength: 17
+        fleet_id:
+          type: string
+          format: uuid
+          nullable: true
+        make:
+          type: string
+          nullable: true
+        model:
+          type: string
+          nullable: true
+        id:
+          type: string
+          format: uuid
+        updated_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - vin
+      - fleet_id
+      - make
+      - model
+    example:
+      type: object
+      properties:
+        fleet_id:
+          type: string
+          format: uuid
+        string_field:
+          type: string
+        integer_field:
+          type: integer
+        id:
+          type: string
+          format: uuid
+        updated_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - fleet_id
+      - string_field
+      - integer_field
+  headers:
+    authorization:
+      required: true
+      description: Authorization token
+      schema:
+        type: string
+        format: Bearer <token>
+    current_page:
+      required: true
+      description: Current Page
+      schema:
+        type: integer
+    total_count:
+      required: true
+      description: Total items available
+      schema:
+        type: integer
+    access_control_allow_headers:
+      required: true
+      description: Access Control Allow Headers
+      schema:
+        type: array
+    total_pages:
+      required: true
+      description: Total pages available
+      schema:
+        type: integer
+    access_control_max_age:
+      required: true
+      description: Access Control Allow Credentials
+      schema:
+        type: integer
+    access_control_allow_origin:
+      required: true
+      description: Access Control Allow Credentials
+      schema:
+        type: string
+    access_control_allow_credentials:
+      required: true
+      description: Access Control Allow Credentials
+      schema:
+        type: boolean
+    access_control_allow_methods:
+      required: true
+      description: Access Control Allow Credentials
+      schema:
+        type: array
+    page_items:
+      required: true
+      description: Item In Page
+      schema:
+        type: integer
+paths:
+  "/api/v1/examples":
+    parameters:
+    - name: Origin
+      in: header
+      description: Origin host
+      schema:
+        type: string
+    get:
+      summary: lists example
+      tags:
+      - example
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: fleet_id
+        required: true
+        description: Example UUID
+        schema:
+          type: string
+          format: uuid
+      - "$ref": "#/components/parameters/page"
+      - "$ref": "#/components/parameters/itemsPerPage"
+      description: returns a paginated array of example items
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+            Current-Page:
+              "$ref": "#/components/headers/current_page"
+            Page-Items:
+              "$ref": "#/components/headers/page_items"
+            Total-Count:
+              "$ref": "#/components/headers/total_count"
+            Total-Pages:
+              "$ref": "#/components/headers/total_pages"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/example"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    post:
+      summary: creates example
+      tags:
+      - example
+      security:
+      - bearerAuth: []
+      description: creates and returns the created example item
+      parameters: []
+      responses:
+        '201':
+          description: example created
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/example"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fleet_id:
+                  type: string
+                  format: uuid
+                string_field:
+                  type: string
+                integer_field:
+                  type: integer
+              required:
+              - fleet_id
+  "/api/v1/examples/{id}":
+    parameters:
+    - name: Origin
+      in: header
+      description: Origin host
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Example UUID
+      schema:
+        type: string
+        format: uuid
+      required: true
+    get:
+      summary: shows example
+      tags:
+      - example
+      security:
+      - bearerAuth: []
+      description: returns the requested example item
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fleet_id:
+                    type: string
+                    format: uuid
+                  string_field:
+                    type: string
+                  integer_field:
+                    type: integer
+                  id:
+                    type: string
+                    format: uuid
+                  updated_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+                required:
+                - fleet_id
+                - string_field
+                - integer_field
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    put:
+      summary: updates example
+      tags:
+      - example
+      security:
+      - bearerAuth: []
+      description: updates and returns the updated example item
+      parameters: []
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/example"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fleet_id:
+                  type: string
+                  format: uuid
+                string_field:
+                  type: string
+                integer_field:
+                  type: integer
+    delete:
+      summary: destroys example
+      tags:
+      - example
+      security:
+      - bearerAuth: []
+      description: deletes and returns the deleted example item
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/example"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+  "/api/v1/vehicles":
+    parameters:
+    - name: Origin
+      in: header
+      description: Origin host
+      schema:
+        type: string
+    get:
+      summary: lists vehicle
+      tags:
+      - vehicle
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: fleet_id
+        required: false
+        description: Fleet UUID
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: vins
+        required: false
+        description: Vehicles VINs array
+        schema:
+          type: array
+          items:
+            type: string
+      - "$ref": "#/components/parameters/page"
+      - "$ref": "#/components/parameters/itemsPerPage"
+      description: returns a paginated array of vehicle items
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+            Current-Page:
+              "$ref": "#/components/headers/current_page"
+            Page-Items:
+              "$ref": "#/components/headers/page_items"
+            Total-Count:
+              "$ref": "#/components/headers/total_count"
+            Total-Pages:
+              "$ref": "#/components/headers/total_pages"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/vehicle"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    post:
+      summary: creates vehicle
+      tags:
+      - vehicle
+      security:
+      - bearerAuth: []
+      description: creates and returns the created vehicle item
+      parameters: []
+      responses:
+        '201':
+          description: vehicle created
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vehicle"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vin:
+                  type: string
+                  minLength: 17
+                  maxLength: 17
+                fleet_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                make:
+                  type: string
+                  nullable: true
+                model:
+                  type: string
+                  nullable: true
+              required:
+              - vin
+              - vehicle_id
+  "/api/v1/vehicles/{id}":
+    parameters:
+    - name: Origin
+      in: header
+      description: Origin host
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Vehicle UUID
+      schema:
+        type: string
+        format: uuid
+      required: true
+    get:
+      summary: shows vehicle
+      tags:
+      - vehicle
+      security:
+      - bearerAuth: []
+      description: returns the requested vehicle item
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vin:
+                    type: string
+                    minLength: 17
+                    maxLength: 17
+                  fleet_id:
+                    type: string
+                    format: uuid
+                    nullable: true
+                  make:
+                    type: string
+                    nullable: true
+                  model:
+                    type: string
+                    nullable: true
+                  id:
+                    type: string
+                    format: uuid
+                  updated_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+                required:
+                - id
+                - vin
+                - fleet_id
+                - make
+                - model
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    put:
+      summary: updates vehicle
+      tags:
+      - vehicle
+      security:
+      - bearerAuth: []
+      description: updates and returns the updated vehicle item
+      parameters: []
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vehicle"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vin:
+                  type: string
+                  minLength: 17
+                  maxLength: 17
+                fleet_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                make:
+                  type: string
+                  nullable: true
+                model:
+                  type: string
+                  nullable: true
+    delete:
+      summary: destroys vehicle
+      tags:
+      - vehicle
+      security:
+      - bearerAuth: []
+      description: deletes and returns the deleted vehicle item
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vehicle"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"

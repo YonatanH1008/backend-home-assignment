@@ -1,0 +1,4 @@
+:required:    true
+:description: Total pages available
+:schema:
+  :type: :integer

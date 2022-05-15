@@ -1,0 +1,19 @@
+#!/bin/bash -e
+test "$#" -gt 1 && echo "Unsupported args: $@" >&2 && exit 145
+cd "$( dirname "${BASH_SOURCE[0]}" )"/..
+
+export GITHUB_SSH_ID_ED25519_B64="`cat .ssh/id_ed25519 | base64`"
+export GITHUB_SSH_KNOWN_HOSTS_B64="`cat .ssh/known_hosts | base64`"
+
+TESTER=${1:-tester}
+
+export COMPOSE_FILE=spec/docker-compose.yml
+export COMPOSE_PROJECT_NAME=nemodata_template_dev
+
+docker-compose down -v || echo "Oh well, let's up anyway.." >&2
+docker-compose rm -svf
+docker-compose build --pull --force-rm
+docker-compose run "$TESTER" && \
+    ( docker-compose run --rm tester bash -c 'bin/rake db:setup; SPRING_WATCH_DISABLE=y SPEC_COVERAGE_DISABLE=y bin/rake rswag:specs:swaggerize' && \
+    docker-compose down -v && docker-compose rm -svf ) || \
+        docker-compose logs

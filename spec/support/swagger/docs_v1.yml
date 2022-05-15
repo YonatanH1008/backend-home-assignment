@@ -1,0 +1,30 @@
+:openapi: 3.0.3
+:security:
+  - bearerAuth: []
+:info:
+  :title:       Hello World
+  :version:     v1
+  :description: Hello World
+  :contact:
+    :name:  API Support
+    :email: support@nemodata.ai
+:components:
+# TODO SEE rswag-ui.rb
+# :servers:
+#   - :url: /api:components:
+  :parameters:
+  :securitySchemes:
+    :bearerAuth:
+      :type:         http
+      :scheme:       bearer
+      :bearerFormat: JWT
+  :schemas:
+    :errors_object:
+      :type: :object
+      :required:
+        - errors
+      :properties:
+        :errors:
+          :type: :array
+          :items:
+            :type: :string

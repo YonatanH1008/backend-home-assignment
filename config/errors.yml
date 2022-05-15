@@ -1,0 +1,12 @@
+- :class: StandardError
+  :name:  :internal_server_error
+- :class: ActiveRecord::RecordNotFound
+  :name:  :not_found
+- :class: ActiveRecord::RecordInvalid
+  :name:  :unprocessable_entity
+- :class: ActionController::UnpermittedParameters
+  :name:  :not_acceptable
+- :class: ActionController::ParameterMissing
+  :name:  :not_acceptable
+- :class: ForbiddenError
+  :name:  :forbidden

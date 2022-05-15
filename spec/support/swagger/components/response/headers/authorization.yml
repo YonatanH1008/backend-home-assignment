@@ -1,0 +1,5 @@
+:required:    true
+:description: Authorization token
+:schema:
+  :type:   :string
+  :format: Bearer <token>

@@ -1,0 +1,32 @@
+version: '3.4'
+services:
+  # TODO no integ specs yet
+  #   environment:
+  #     - WEB_ORIGIN=http://dummy:3000
+  postgres:
+    image: postgres
+    volumes:
+      - postgresql_run:/var/run/postgresql
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=test
+  tester:
+    depends_on:
+      - postgres
+    build:
+      context: ..
+      args:
+        GITHUB_SSH_ID_ED25519_B64: "$GITHUB_SSH_ID_ED25519_B64"
+        GITHUB_SSH_KNOWN_HOSTS_B64: "$GITHUB_SSH_KNOWN_HOSTS_B64"
+    volumes:
+      - ..:/usr/src/app
+      - postgresql_run:/var/run/postgresql
+      - tester_var:/usr/src/app/var
+    command: bin/rspec
+    environment:
+      - POSTGRES_HOST=postgres
+volumes:
+  postgresql_run:
+  # NOTE tmpfs doesn't perform too well (with fsevents etc)
+  tester_var:

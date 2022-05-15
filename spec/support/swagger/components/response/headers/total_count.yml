@@ -1,0 +1,4 @@
+:required:    true
+:description: Total items available
+:schema:
+  :type: :integer

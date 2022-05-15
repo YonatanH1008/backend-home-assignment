@@ -1,0 +1,5 @@
+#!/bin/bash -e
+test "$#" -gt 1 && echo "Unsupported args: $@" >&2 && exit 145
+cd "$( dirname "${BASH_SOURCE[0]}" )"/..
+
+docker run --rm -it -v "`pwd`:`pwd`" -w "`pwd`" -v "`pwd`/.ssh:/root/.ssh" -e GIT_SSH_COMMAND='ssh -i /root/.ssh/id_ed25519 -o UserKnownHostsFile=/root/.ssh/known_hosts -o CheckHostIP=no -o HashKnownHosts=no' ruby:3.0 bundle update

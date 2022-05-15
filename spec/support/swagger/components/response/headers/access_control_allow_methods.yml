@@ -1,0 +1,4 @@
+:required:    true
+:description: Access Control Allow Credentials
+:schema:
+  :type: :array
