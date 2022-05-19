@@ -5,6 +5,8 @@ module Api
     # rubocop:disable Rails/LexicallyScopedActionFilter
     class VehiclesController < BaseController
       before_action :permissions_included_in_any_fleet!
+      before_action -> { deny_permit_by_update!(resource.fleet_id, params[:fleet_id]) if params[:fleet_id] },
+                    only: :update
       before_action -> { any_fleet_is_permitted!(resource.fleet_id) }, only: %i[show update destroy]
       before_action -> { raise ActionController::ParameterMissing, :fleet_id if params[:fleet_id].blank? },
                     only: %i[bulk_update create status_count]
@@ -30,6 +32,12 @@ module Api
         return resource_class_model if all_fleets?
 
         resource_class_model.where(fleet_id: permitted_fleet_ids)
+      end
+
+      def deny_permit_by_update!(*ids)
+        return if all_fleets? || ids.uniq.size == 1
+
+        raise ForbiddenError if permitted_fleet_ids.intersection(ids).size == 1
       end
     end
 
