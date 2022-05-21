@@ -10,7 +10,16 @@ RSpec.shared_examples 'permissions' do |model, action, options = {}|
   let(:fleet1) { create(:fleet) }
   let(:fleet2) { create(:fleet) }
   let(:permitted_fleet_ids) { [fleet1.id, fleet2.id] }
-  let(:permitted_record) { create(model, fleet_id: permitted_fleet_ids.first) }
+
+  let(:permitted_record) do
+    case model
+    when :fleet
+      fleet1
+    else
+      create(model, fleet_id: permitted_fleet_ids.first)
+    end
+  end
+
   let(:unpermitted_record) { create(model) }
   let(:attributes) { attributes_for(model) }
 

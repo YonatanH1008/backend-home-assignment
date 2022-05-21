@@ -35,7 +35,7 @@ module Api
       end
 
       def deny_permit_by_update!(*ids)
-        return if all_fleets? || ids.uniq.size == 1
+        return if all_fleets? || ids.uniq.size == 1 # allows updating with same un-permitted fleet_id
 
         raise ForbiddenError if permitted_fleet_ids.intersection(ids).size == 1
       end
