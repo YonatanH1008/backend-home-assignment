@@ -9,7 +9,11 @@ RSpec.describe Api::V1::VehiclesController, type: :controller do
     request.headers['Authorization'] = send('Authorization')
   end
 
-  let(:permitted_fleet_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
+  let(:fleet1) { create(:fleet) }
+  let(:fleet2) { create(:fleet) }
+  let(:unpermitted_fleet) { create(:fleet) }
+
+  let(:permitted_fleet_ids) { [fleet1.id, fleet2.id] }
   let(:permitted_vehicle) { create(:vehicle, fleet_id: permitted_fleet_ids.first) }
   let(:unpermitted_vehicle) { create(:vehicle) }
 
@@ -87,14 +91,14 @@ RSpec.describe Api::V1::VehiclesController, type: :controller do
       authorize_user(:vehicle, :create, fleets: ['*'])
 
       it 'allows creation of vehicle in any fleet' do
-        post :create, params: attributes_for(:vehicle)
+        post :create, params: attributes_for(:vehicle).merge({ fleet_id: fleet1.id })
 
         expect(response).to have_http_status :success
       end
     end
 
     it 'requires fleet scope' do
-      post :create, params: attributes_for(:vehicle).except(:fleet_id)
+      post :create, params: attributes_for(:vehicle)
 
       expect(response.parsed_body['errors'][0]).to eq('param is missing or the value is empty: fleet_id')
     end
@@ -136,13 +140,13 @@ RSpec.describe Api::V1::VehiclesController, type: :controller do
     it 'does not allows moving vehicle from a permitted fleet to an unpermitted fleet' do
       vehicle = create(:vehicle, fleet_id: permitted_fleet_ids[0])
 
-      put :update, params: { id: vehicle.id, fleet_id: SecureRandom.uuid }
+      put :update, params: { id: vehicle.id, fleet_id: unpermitted_fleet.id }
 
       expect(response).to have_http_status :forbidden
     end
 
     it 'does not allows moving vehicle from an unpermitted fleet to a permitted fleet' do
-      vehicle = create(:vehicle, fleet_id: SecureRandom.uuid)
+      vehicle = create(:vehicle, fleet_id: unpermitted_fleet.id)
 
       put :update, params: { id: vehicle.id, fleet_id: permitted_fleet_ids[0] }
 
@@ -165,15 +169,14 @@ RSpec.describe Api::V1::VehiclesController, type: :controller do
       it 'allows update of vehicle in from permitted to unpermitted' do
         vehicle = create(:vehicle, fleet_id: permitted_fleet_ids[0])
 
-        new_id = SecureRandom.uuid
-        put :update, params: { id: vehicle.id, fleet_id: new_id }
+        put :update, params: { id: vehicle.id, fleet_id: unpermitted_fleet.id }
 
-        expect(vehicle.reload.fleet_id).to eq(new_id)
+        expect(vehicle.reload.fleet_id).to eq(unpermitted_fleet.id)
         expect(response).to have_http_status :ok
       end
 
       it 'allows update of vehicle in from unpermitted to permitted' do
-        vehicle = create(:vehicle, fleet_id: SecureRandom.uuid )
+        vehicle = create(:vehicle, fleet_id: unpermitted_fleet.id )
 
         put :update, params: { id: vehicle.id, fleet_id: permitted_fleet_ids[0] }
 

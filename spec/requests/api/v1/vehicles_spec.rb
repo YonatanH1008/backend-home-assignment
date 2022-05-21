@@ -7,7 +7,9 @@ schema = load_schema(:vehicle)
 # rubocop:disable Rspec/EmptyExampleGroup
 RSpec.describe 'Vehicle SWAGGER', type: :request, resource: :vehicle, schema: schema do
   origin_let
-  let(:permitted_fleet_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
+  let(:fleet1) { create(:fleet) }
+  let(:fleet2) { create(:fleet) }
+  let(:permitted_fleet_ids) { [fleet1.id, fleet2.id] }
 
   path "#{SWAGGER_SERVICE_PATH_PREFIX_DEFAULT}/v1/vehicles" do
     origin_parameter

@@ -7,7 +7,9 @@ RSpec.shared_examples 'permissions' do |model, action, options = {}|
     request.headers['Authorization'] = send('Authorization')
   end
 
-  let(:permitted_fleet_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
+  let(:fleet1) { create(:fleet) }
+  let(:fleet2) { create(:fleet) }
+  let(:permitted_fleet_ids) { [fleet1.id, fleet2.id] }
   let(:permitted_record) { create(model, fleet_id: permitted_fleet_ids.first) }
   let(:unpermitted_record) { create(model) }
   let(:attributes) { attributes_for(model) }
@@ -25,7 +27,6 @@ RSpec.shared_examples 'permissions' do |model, action, options = {}|
                        [:get, fleet_id ? { fleet_id: fleet_id } : nil]
                      end
       send(verb, action, **{ params: params }.compact)
-
       expect(response).to have_http_status :forbidden
     end
   end
