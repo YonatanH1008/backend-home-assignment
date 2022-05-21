@@ -31,6 +31,15 @@ RSpec.describe Api::V1::VehiclesController, type: :controller do
       expect(response.parsed_body.pluck('id')).to eq([permitted_vehicle.id])
     end
 
+    it 'filters vehicles by vins' do
+      unfiltered = create(:vehicle, fleet_id: permitted_fleet_ids.first)
+      create(:vehicle, fleet_id: permitted_fleet_ids.last)
+
+      get :index, params: { vins: unfiltered.vin }
+
+      expect(response.parsed_body.pluck('id')).to eq([unfiltered.id])
+    end
+
     it 'filters vehicles by fleet_id' do
       create(:vehicle, fleet_id: nil)
       create(:vehicle, fleet_id: permitted_fleet_ids.first)
@@ -140,15 +149,36 @@ RSpec.describe Api::V1::VehiclesController, type: :controller do
       expect(response).to have_http_status :forbidden
     end
 
+    it 'allows updating fleet with same id' do
+      vehicle = create(:vehicle, fleet_id: permitted_fleet_ids[0])
+
+      put :update, params: { id: vehicle.id, fleet_id: permitted_fleet_ids[0] }
+
+      expect(vehicle.reload.fleet_id).to eq(permitted_fleet_ids[0])
+      expect(response).to have_http_status :ok
+    end
+
+    # copied from '#show' context, converted to cover same logic for update
     context 'with fleet *' do
-      authorize_user(:vehicle, :show, fleets: ['*'])
+      authorize_user(:vehicle, :update, fleets: ['*'])
 
-      it 'allows view of vehicle in any fleet' do
-        id = create(:vehicle).id
+      it 'allows update of vehicle in from permitted to unpermitted' do
+        vehicle = create(:vehicle, fleet_id: permitted_fleet_ids[0])
 
-        get :show, params: { id: id }
+        new_id = SecureRandom.uuid
+        put :update, params: { id: vehicle.id, fleet_id: new_id }
 
-        expect(response.parsed_body['id']).to eq(id)
+        expect(vehicle.reload.fleet_id).to eq(new_id)
+        expect(response).to have_http_status :ok
+      end
+
+      it 'allows update of vehicle in from unpermitted to permitted' do
+        vehicle = create(:vehicle, fleet_id: SecureRandom.uuid )
+
+        put :update, params: { id: vehicle.id, fleet_id: permitted_fleet_ids[0] }
+
+        expect(vehicle.reload.fleet_id).to eq(permitted_fleet_ids[0])
+        expect(response).to have_http_status :ok
       end
     end
   end
