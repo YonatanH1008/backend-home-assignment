@@ -1,0 +1,38 @@
+:create_attributes: &CREATE_ATTRIBUTES
+  :name:
+    :type:     string
+    :nullable: true
+:update_attributes: &UPDATE_ATTRIBUTES
+  <<: *CREATE_ATTRIBUTES
+:base_attributes: &BASE_ATTRIBUTES
+  <<: *CREATE_ATTRIBUTES
+:generated_attributes: &GENERATED_ATTRIBUTES
+  :id:
+    :type:   string
+    :format: uuid
+  :updated_at:
+    :type:   string
+    :format: date-time
+  :created_at:
+    :type:   string
+    :format: date-time
+:all_attributes: &ALL_ATTRIBUTES
+  <<: *BASE_ATTRIBUTES
+  <<: *GENERATED_ATTRIBUTES
+:response_attributes: &RES_ATTRIBUTES
+  :type: object
+  :properties:
+    <<: *ALL_ATTRIBUTES
+  :required:
+    - id
+    - name
+:extended_response:
+  <<: *RES_ATTRIBUTES
+:action_params:
+  :update: &UPDATE_PARAMS
+    :type: object
+    :properties:
+      <<: *UPDATE_ATTRIBUTES
+  :create:
+    <<: *UPDATE_PARAMS
+  :index:

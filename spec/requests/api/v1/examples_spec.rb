@@ -6,7 +6,10 @@ schema = load_schema(:example)
 
 RSpec.describe 'Example SWAGGER', type: :request, resource: :example, schema: schema do
   origin_let
-  let(:permitted_fleet_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
+  let(:fleet1) { create(:fleet) }
+  let(:fleet2) { create(:fleet) }
+  let(:permitted_fleet_ids) { [fleet1.id, fleet2.id] }
+  let(:fleet_id) { permitted_fleet_ids.first }
 
   path "#{SWAGGER_SERVICE_PATH_PREFIX_DEFAULT}/v1/examples" do
     origin_parameter

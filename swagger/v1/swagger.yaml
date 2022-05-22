@@ -95,6 +95,24 @@ components:
       - fleet_id
       - string_field
       - integer_field
+    fleet:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        id:
+          type: string
+          format: uuid
+        updated_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
   headers:
     authorization:
       required: true
@@ -425,6 +443,273 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/example"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+  "/api/v1/fleets":
+    parameters:
+    - name: Origin
+      in: header
+      description: Origin host
+      schema:
+        type: string
+    get:
+      summary: lists fleet
+      tags:
+      - fleet
+      security:
+      - bearerAuth: []
+      description: returns a paginated array of fleet items
+      parameters:
+      - "$ref": "#/components/parameters/page"
+      - "$ref": "#/components/parameters/itemsPerPage"
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+            Current-Page:
+              "$ref": "#/components/headers/current_page"
+            Page-Items:
+              "$ref": "#/components/headers/page_items"
+            Total-Count:
+              "$ref": "#/components/headers/total_count"
+            Total-Pages:
+              "$ref": "#/components/headers/total_pages"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/fleet"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    post:
+      summary: creates fleet
+      tags:
+      - fleet
+      security:
+      - bearerAuth: []
+      description: creates and returns the created fleet item
+      parameters: []
+      responses:
+        '201':
+          description: fleet created
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/fleet"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  nullable: true
+  "/api/v1/fleets/{id}":
+    parameters:
+    - name: Origin
+      in: header
+      description: Origin host
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Fleet UUID
+      schema:
+        type: string
+        format: uuid
+      required: true
+    get:
+      summary: shows fleet
+      tags:
+      - fleet
+      security:
+      - bearerAuth: []
+      description: returns the requested fleet item
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    nullable: true
+                  id:
+                    type: string
+                    format: uuid
+                  updated_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+                required:
+                - id
+                - name
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    put:
+      summary: updates fleet
+      tags:
+      - fleet
+      security:
+      - bearerAuth: []
+      description: updates and returns the updated fleet item
+      parameters: []
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/fleet"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  nullable: true
+    delete:
+      summary: destroys fleet
+      tags:
+      - fleet
+      security:
+      - bearerAuth: []
+      description: deletes and returns the deleted fleet item
+      responses:
+        '200':
+          description: successful
+          headers:
+            Access-Control-Allow-Origin:
+              "$ref": "#/components/headers/access_control_allow_origin"
+            Access-Control-Allow-Credentials:
+              "$ref": "#/components/headers/access_control_allow_credentials"
+            Access-Control-Expose-Headers:
+              "$ref": "#/components/headers/access_control_allow_headers"
+            Access-Control-Allow-Methods:
+              "$ref": "#/components/headers/access_control_allow_methods"
+            Access-Control-Max-Age:
+              "$ref": "#/components/headers/access_control_max_age"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/fleet"
         '401':
           description: unauthorized
           content:

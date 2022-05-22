@@ -17,10 +17,16 @@ def test_index(options = {})
       cors_headers
       pagination_headers
       authorize_user_request
-      let(:fleet_id) { permitted_fleet_ids.first }
+      setup_all_fleet_permissions if resource == :fleet
 
       it 'returns a valid 200 response' do |example|
-        block_given? ? yield : create_list(resource, 25, fleet_id: permitted_fleet_ids.first)
+        if block_given?
+          yield
+        elsif resource == :fleet
+          create_list(resource, 25)
+        else
+          create_list(resource, 25, fleet_id: permitted_fleet_ids.first)
+        end
 
         run_example!(example)
 
@@ -63,6 +69,7 @@ def test_show
     description "returns the requested #{resource} item"
 
     setup_record
+    permit_record if resource == :fleet
     setup_id
 
     response 200, :successful do
@@ -70,7 +77,7 @@ def test_show
       cors_headers
       authorize_user_request
 
-      it 'returns a valid 201 response' do |example|
+      it 'returns a valid 200 response' do |example|
         run_example!(example)
       end
     end
@@ -88,6 +95,7 @@ def test_update(procc = nil)
     parameter body_params(resource, :update)
 
     setup_record
+    permit_record if resource == :fleet
     setup_id
     let(resource) { build_attributes :update, procc }
 
@@ -118,6 +126,7 @@ def test_destroy
     description "deletes and returns the deleted #{resource} item"
 
     setup_record
+    permit_record if resource == :fleet
     setup_id
 
     response 200, :successful do
@@ -144,15 +153,24 @@ end
 
 def build_attributes(type, procc)
   allowed_keys = self.class.metadata[:schema]["#{type}_attributes".to_sym].keys
-  attributes   = attributes_for(resource, fleet_id: permitted_fleet_ids.first).slice(*allowed_keys)
+  attributes   = attributes_for(resource).slice(*allowed_keys)
+  attributes.merge!({ fleet_id: permitted_fleet_ids.first }) unless resource == :fleet
   procc&.call(attributes, type, permitted_fleet_ids)
   attributes
 end
 
 def setup_record
   let(:record) do
-    create(resource, fleet_id: permitted_fleet_ids.first)
+    resource == :fleet ? create(resource) : create(resource, fleet_id: permitted_fleet_ids.first)
   end
+end
+
+def setup_all_fleet_permissions
+  let(:permitted_fleet_ids) { ['*'] }
+end
+
+def permit_record
+  let(:permitted_fleet_ids) { [record.id] }
 end
 
 def setup_id
